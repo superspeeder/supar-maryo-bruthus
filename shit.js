@@ -16,6 +16,7 @@ function Shit(canvas_size)
     this.img = loadImage("https://i.imgur.com/XghszQO.png");  // load image and set to variable
     this.accelGrav = 0.5;
     this.falling = false;
+    this.tileCollidingWith = null;
     
     
     this.dir = 0;
@@ -46,6 +47,47 @@ function Shit(canvas_size)
     // change y
     // change direction if edge is hit
 
+    this.isCollidingWithTile = function() {
+        var other;
+        this.tileCollidingWith = null;
+        for (index = 0; index < this.getCollidables().length; index++) {
+            other = this.getCollidables()[index];
+            if (this.x < other.x + other.width && this.x + this.width > other.x && this.y < other.y + other.height && this.y + this.height > other.y) {
+                this.tileCollidingWith = other;
+                return true;
+            }
+        }
+    }
+    
+    this.another_movement_function_to_be_integrated_later = function() {
+        this.x += speed;
+        
+        if (this.isCollidingWithTile()) {
+            if (this.speed > 0) {
+                this.x = this.getTileCollidingWith().getLeftSide();
+            } else {
+                this.x = this.getTileCollidingWith().getRightSide();
+            }
+            this.speed = 0;
+            this.still = 0;
+        }
+
+//        this.vertVelocity += this.accelerationy;
+        this.y += this.vertVelocity;
+
+        if (this.isCollidingWithTile()) {
+            if (this.vertVelocity > 0) {
+                this.y = this.getTileCollidingWith().getTopSide();
+                this.stopy();
+                this.grounded = true;
+            } else {
+                this.y = this.getTileCollidingWith().getRightSide();
+                this.accelerationy = this.accelGrav;
+            }
+        }
+    }
+    
+    this.getTileCollidingWith = function() { return this.tileCollidingWith; }
     this.update = function () 
     {
         if (this.still == true) {

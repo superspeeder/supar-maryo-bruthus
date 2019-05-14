@@ -12,23 +12,33 @@ function keyInput() {
         shit.Crouch()
     }
     if (keyIsDown(RIGHT_ARROW)) {
-        shit.still = false
         shit.still = false;
-        if (shit.speed < 8) {
-            shit.speed = shit.speed + 0.5;
+        if (keyIsDown(SHIFT)) {
+            if (shit.speed < 14) {
+                shit.speed = shit.speed + 0.5;
+            }
+        } else {
+            if (shit.speed < 8) {
+                shit.speed = shit.speed + 0.5;
+            }
         }
     }
     else if (keyIsDown(LEFT_ARROW)) {
         shit.still = false;
-        if (shit.speed > -8) {
-            shit.speed = shit.speed - 0.5;
+        if (keyIsDown(SHIFT)) {
+            if (shit.speed > -14) {
+                shit.speed = shit.speed - 0.5;
+            }
+        } else {
+            if (shit.speed > -8) {
+                shit.speed = shit.speed - 0.5;
+            }
         }
     } else {
         shit.still = true;
     }
     if (keyIsDown(UP_ARROW) && (shit.jumptime <= 0.75 || shit.grounded) && !shit.falling) {
-        console.log(shit.jumptime);
-        
+        console.log(shit.jumptime);   
         shit.Jump()
     }
 }
