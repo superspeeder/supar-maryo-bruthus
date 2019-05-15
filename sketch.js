@@ -1,6 +1,19 @@
 var shit;
 var paused = false;
 var canvas_s = [600, 400];
+var level = {"collidables": [
+    new CollisionRect(0,336,300,64),
+    new CollisionRect(364,336,436,64)
+], "drawElements": [
+    {"rect": new CollisionRect(0,336,300,64),"fillcolor":"brown","strokecolor":"black"},
+    {"rect": new CollisionRect(364,336,436,64),"fillcolor":"brown","strokecolor":"black"}
+]}
+
+function drawElements(xoffset) {
+    level.drawElements.forEach(element => {
+        rect(element.rect)
+    });
+}
 
 function setup() {
     createCanvas(canvas_s[0], canvas_s[1]);
@@ -37,7 +50,7 @@ function keyInput() {
     } else {
         shit.still = true;
     }
-    if (keyIsDown(UP_ARROW) && (shit.jumptime <= 0.75 || shit.grounded) && !shit.falling) {
+    if (keyIsDown(UP_ARROW) && (shit.jumptime <= 0.75 || shit.grounded) && !shit.falling && !shit.dead && !shit.canceljump) {
         console.log(shit.jumptime);   
         shit.Jump()
     }
