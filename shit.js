@@ -5,19 +5,18 @@ function Shit(canvas_size, collidables)
     this.jumptime = 0;
     this.jumping = false;
     this.still = true;
-    this.grounded = true;
+    this.grounded = false;
     this.vertVelocity = 0;
     this.starty = 90;
     this.startx = 40;
     this.dead = false;
     this.x = 64;
     this.y = 64;
-    this.w_ = 32;
-    this.h_ = 32;
+    this.w = 32;
+    this.h = 32;
     this.img = loadImage("https://i.imgur.com/XghszQO.png");  // load image and set to variable
     this.accelGrav = 0.5;
-    // this.accelGrav = 0;
-    this.falling = false;
+    this.falling = true;
     this.tileCollidingWith = null;
     this.canceljump = false;
     this.collidables = collidables;
@@ -27,88 +26,67 @@ function Shit(canvas_size, collidables)
     this.dir = 0;
     this.speed = 0;
 
-    this.onHitGround = function() {
-        this.canceljump = false;
-    };
-
+    // jumps
     this.Jump = function () {
         this.grounded = false;
+        this.falling = false;
+        this.jumping = true;
         this.jumptime = this.jumptime + 0.1;
-//        this.vertVelocity = - ( this.jumptime ^ 2 ) + 10 * this.jumptime
         this.vertVelocity = -10;
-    };
-
-    this.stop = function () {
-
-    };
-
-    this.Crouch = function () {
-
-    };
-
-    this.kill = function() {
-        this.vertVelocity = -16;
-    };
-
-    this.getCollidables = function() {
-        return this.collidables;
     };
 
     // place image on screen at given coordinates and size
     this.show = function ()
     {
-        image(this.img, this.x, this.y, 32,32);
+        image(this.img, this.x, this.y, this.w,this.h);
     };
-
-    // update position of bird
-    // change y
-    // change direction if edge is hit
-
+    
+    
+    //check collisions
     this.isCollidingWithTile = function() {
-        // console.log("collide check")
         var r2;
-	      var index;
+	    var index;
         this.tileCollidingWith = null;
-        for (index = 0; index < this.getCollidables().length; index++) {
-            r2 = this.getCollidables()[index].rect;
-            console.log(!(r2.x > this.x+this.w_ || r2.x + r2.w_ < this.x || r2.y > this.y + this._h || r2.y + r2._h < this.y));
-            if ((this.left <= r2.right &&
-          r2.left <= this.right &&
-          this.top <= r2.bottom &&
-          r2.top <= this.bottom)) {
-              this.tileCollidingWith = r2;
-              return true;
+        for (index=0;index < this.collidables.length ; index++) {
+            r2 = this.collidables[index];
+            if (this.x <= r2.x + r2.w && this.x >= r2.x && this.y + this.h >= r2.y && this.y <= r2.y + r2.h) { // condition to check rectangle intersection
+                this.tileCollidingWith = r2; //set tile colliding with
+                return true;
             }
         }
-        return false;
+        return false; // no tile collided with; return false
     };
 
-    this.stopy = function() {
-      this.accelerationy = 0;
-      this.vertVelocity = 0;
-    };
 
+    //reset values
     this.restart = function() {
-        this.x = this.startx;
-        this.y = this.starty;
-        this.dead = false;
-        this.speed = 0;
-        this.vertVelocity = 0;
-        this.accelerationy = 0;
-        this.grounded = false;
-        this.falling = true;
-
+        this.jumptime = 0;
         this.jumping = false;
-        this.jumptime = false;
-        this.canceljump = true;
-
+        this.still = true;
+        this.grounded = false;
+        this.vertVelocity = 0;
+        this.starty = 90;
+        this.startx = 40;
+        this.dead = false;
+        this.x = 64;
+        this.y = 64;
+        this.w = 32;
+        this.h = 32;
+        this.accelGrav = 0.5;
+        // this.accelGrav = 0;
+        this.falling = true;
+        this.tileCollidingWith = null;
+        this.canceljump = false;
+        this.accelerationy = 0;
+        this.speed = 0;
     };
+    
+    
+    
 
-    this.getTileCollidingWith = function() { return this.tileCollidingWith; };
     this.update = function ()
     {
         // sliding horizontal movement
-        console.log("update");
         if (this.still == true) {
             if (this.speed < 0) {
                 this.speed = this.speed + 0.5;
@@ -117,67 +95,37 @@ function Shit(canvas_size, collidables)
                 this.speed = this.speed - 0.5;
             }
         }
-
-        console.log("update fall");
-        // falling
-        if (!this.grounded && !this.jumping) {
-            this.vertVelocity += this.accelGrav;
-        }
-
-        // sets this.falling to true when its not on the ground and the vertical velocity is greater than or equal to 0
-        if (this.vertVelocity >= 0 && !this.grounded) {
-            this.falling = true;
-        }
-
-
-//        console.log((shit.jumping == false || shit.jumptime <= 2));
-
-        console.log("update x");
+        
+        //x movement
         this.x += this.speed;
-
-        if (this.isCollidingWithTile()) {
-          if (this.speed > 0) {
-            this.x = this.getTileCollidingWith().x + this.getTileCollidingWith().w;
-          } else if (this.speed < 0) {
-            this.x = this.getTileCollidingWith().x + this.w_;
-          }
-          this.speed = 0;
-          this.still = 0;
+        
+        // decide whether to do gravity or not
+        if (!this.grounded || this.jumping) {
+            this.accelerationy = this.accelGrav;
+        } else {
+            this.accelerationy = 0;
+            this.vertVelocity = 0;
         }
 
-        console.log("update y");
+        // y movement
         this.vertVelocity += this.accelerationy;
         this.y += this.vertVelocity;
-
-        if (this.isCollidingWithTile() && this.vertVelocity != 0) {
-          if (this.vertVelocity > 0) {
-            this.y = this.getTileCollidingWith().y-this.getTileCollidingWith().h;
-            this.stopy();
+        
+        // y collisions
+        if (this.isCollidingWithTile()) {
+            this.falling = false;
+            this.jumping = false;
+            this.y = this.tileCollidingWith.y - this.h
             this.grounded = true;
-          } else if (this.vertVelocity < 0){
-            this.y = this.getTileCollidingWith().y - this.h_;
-            this.accelerationy = this.accelGrav;
-          }
+        } else {
+            this.falling = true;
+            this.grounded = false;
         }
-
-
-        console.log("update hit ground");
-        if (this.y + this.vertVelocity > this.canvas_h) {
-            if (this.dead) {
-                this.restart();
-                console.log(this.vertVelocity);
-            } else {
-                // this.falling = false;
-                // this.y = this.canvas_h - this.w;
-                // this.vertVelocity = 0;
-                // this.grounded = true;
-                // this.jumping = false;
-                // this.jumptime = 0;
-                this.speed = 0;
-                this.dead = true;
-                this.kill();
-            }
+        
+        //check if player has fallen off the screen
+        if (this.y >= 400) {
+            this.restart();
         }
-        console.log("done_update");
+        
     };
 }
