@@ -11,13 +11,15 @@ var level = {"collidables": [
 
 function drawElements(xoffset) {
     level.drawElements.forEach(element => {
-        rect(element.rect)
+      stroke(element.strokecolor);
+      fill(element.fillcolor);
+      rect(element.rect.x,element.rect.y,element.rect.w,element.rect.h);
     });
 }
 
 function setup() {
     createCanvas(canvas_s[0], canvas_s[1]);
-    shit = new Shit(canvas_s);
+    shit = new Shit(canvas_s, level.collidables);
 }
 
 function keyInput() {
@@ -51,23 +53,24 @@ function keyInput() {
         shit.still = true;
     }
     if (keyIsDown(UP_ARROW) && (shit.jumptime <= 0.75 || shit.grounded) && !shit.falling && !shit.dead && !shit.canceljump) {
-        console.log(shit.jumptime);   
+        console.log(shit.jumptime);
         shit.Jump()
     }
 }
 
 //function keyReleased() {
 //    if (key == UP_ARROW) {
-//        
+//
 //    }
 //}
 
 
-function draw() 
+function draw()
 {
     background(100, 200, 255);  // blueish background
-    rect(545, 0, 55, 55);
-    if (!paused) 
+    // rect(545, 0, 55, 55);
+    drawElements();
+    if (!paused)
     {
         shit.update();
     }
@@ -80,17 +83,17 @@ function draw()
 /* Custom functions */
 
 function keyReleased() {
-    
-}    
 
-function keyPressed() 
+}
+
+function keyPressed()
 {
-//    if (!paused && keyCode === UP_ARROW) 
+//    if (!paused && keyCode === UP_ARROW)
 //    {
 //        shit.Jump();
-//    } 
-    
-    if (key === 'p') 
+//    }
+
+    if (key === 'p')
     {
         paused = !paused;
     }
